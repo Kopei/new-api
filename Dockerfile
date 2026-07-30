@@ -15,6 +15,13 @@ ARG TARGETARCH
 ENV GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64}
 ENV GOEXPERIMENT=greenteagc
 
+# proxy.golang.org is unreachable from some build networks (observed on the
+# fork's CI/dev host); fall back through goproxy.cn before going direct so
+# `go mod download` doesn't hang indefinitely. Override with --build-arg
+# GOPROXY=... if a different mirror is needed.
+ARG GOPROXY=https://goproxy.cn,https://proxy.golang.org,direct
+ENV GOPROXY=${GOPROXY}
+
 WORKDIR /build
 
 ADD go.mod go.sum ./
